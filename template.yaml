@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-feedback-dynamodb-event-reader
+
+  Sample SAM Template for sam-feedback-dynamodb-event-reader to interact with DynamoDB Events.
+
+Globals:
+  Function:
+    Timeout: 5
+
+    Tracing: Active
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  ReadDynamoDBEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: feedback-event-reader/
+      Handler: app.handler
+      Runtime: nodejs20.x
+      Events:
+        DynamoDBEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: arn:aws:dynamodb:us-east-1:499604939475:table/feedbacks/stream/2025-07-03T16:47:17.589
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 10
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - app.ts
